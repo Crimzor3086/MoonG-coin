@@ -72,6 +72,11 @@ npx hardhat run scripts/verify.js --network 0gTestnet
 
 Requires `CONTRACT_ADDRESS` and `INITIAL_SUPPLY` in `.env`.
 
+## Deployed Addresses (Zero Gravity Blockchain)
+
+- 0G Testnet (chainId 16601): `0xAEa0B5a229B9A37da37dd0CD124a19b69ee6cbB9`
+  - Explorer: https://chainscan-galileo.0g.ai/address/0xAEa0B5a229B9A37da37dd0CD124a19b69ee6cbB9
+
 ## Web UI (index.html)
 
 Serve locally and open in a browser with a wallet (MetaMask):
