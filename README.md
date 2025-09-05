@@ -2,27 +2,7 @@
 
 ERC-20 meme coin on 0G networks using Hardhat and OpenZeppelin.
 
-## Setup
-
-1. Install Node 18+.
-2. Install deps: `npm install`
-3. Create `.env`:
-
-```
-PRIVATE_KEY=0x...
-CONTRACT_ADDRESS= # fill after deploy
-INITIAL_SUPPLY=1000000000
-```
-
-## Compile
-
-```
-npx hardhat compile
-```
-
-## Test
-
-```
+`
 npx hardhat test
 ```
 
