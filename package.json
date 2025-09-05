@@ -1,0 +1,17 @@
+{
+  "name": "moong-coin",
+  "version": "1.0.0",
+  "description": "MoonG Meme Coin on 0G",
+  "scripts": {
+    "compile": "hardhat compile",
+    "deploy:testnet": "hardhat run scripts/deploy.js --network 0gTestnet",
+    "deploy:mainnet": "hardhat run scripts/deploy.js --network 0gMainnet",
+    "test": "hardhat test"
+  },
+  "dependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@openzeppelin/contracts": "^5.0.0",
+    "dotenv": "^16.4.0",
+    "hardhat": "^2.22.0"
+  }
+}
