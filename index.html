@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>MoonG (MOONG) – Web UI</title>
+    <link rel="icon" type="image/svg+xml" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="%23aef"/><stop offset="100%" stop-color="%2308f"/></linearGradient></defs><circle cx="32" cy="32" r="28" fill="url(%23g)"/><circle cx="25" cy="23" r="3" fill="white" opacity="0.9"/><circle cx="42" cy="28" r="2" fill="white" opacity="0.8"/></svg>' />
+    <style>
+      :root { --bg:#0b0f14; --panel:#121821; --text:#e7eef7; --muted:#92a0b3; --accent:#7dd3fc; --accent2:#22d3ee; --danger:#ef4444; }
+      * { box-sizing: border-box; }
+      body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji","Segoe UI Emoji"; background: linear-gradient(180deg, #0b0f14 0%, #0e141c 100%); color:var(--text); }
+      header { padding:20px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #1f2a37; background:rgba(0,0,0,0.3); position:sticky; top:0; backdrop-filter:saturate(1.2) blur(6px); }
+      .brand { display:flex; gap:12px; align-items:center; font-weight:700; letter-spacing:.3px; }
+      .chip { color:#0a1620; background:linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%); padding:2px 8px; border-radius:999px; font-size:12px; font-weight:700; }
+      .container { max-width:980px; margin:0 auto; padding:24px; }
+      .grid { display:grid; gap:16px; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); }
+      .card { background:var(--panel); border:1px solid #1f2a37; border-radius:14px; padding:18px; box-shadow:0 10px 30px rgba(0,0,0,0.25); }
+      h1 { font-size:22px; margin:0; }
+      h2 { font-size:16px; margin:0 0 12px 0; color:var(--muted); font-weight:600; }
+      .row { display:flex; gap:12px; align-items:center; }
+      .stack { display:flex; flex-direction:column; gap:8px; }
+      .muted { color:var(--muted); font-size:13px; }
+      input[type="text"], input[type="number"] { width:100%; padding:10px 12px; border-radius:10px; border:1px solid #253241; background:#0d131c; color:var(--text); outline:none; }
+      input::placeholder { color:#5e718a; }
+      button { border:0; background:linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%); color:#041019; font-weight:800; padding:10px 14px; border-radius:10px; cursor:pointer; }
+      button.secondary { background:#0f1722; color:var(--text); border:1px solid #263444; }
+      button:disabled { opacity:.6; cursor:not-allowed; }
+      .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size:12px; }
+      .hr { height:1px; background:#1f2a37; margin:10px 0; }
+      footer { padding:28px; text-align:center; color:#7b8aa0; font-size:13px; }
+      .error { color:var(--danger); font-size:13px; }
+      .success { color:#34d399; font-size:13px; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="brand">
+        <div style="width:10px;height:10px;border-radius:50%;background:radial-gradient(circle at 30% 30%, #aff, #08f); box-shadow:0 0 16px #29e;"> </div>
+        <h1>MoonG <span class="muted">(MOONG)</span></h1>
+        <span class="chip">0G</span>
+      </div>
+      <div class="row" style="gap:8px;">
+        <select id="networkSelect" style="background:#0f1722;color:var(--text);border:1px solid #263444;border-radius:10px;padding:8px;">
+          <option value="0gTestnet">0gTestnet (9000)</option>
+          <option value="0gMainnet">0gMainnet (10000)</option>
+        </select>
+        <span id="network" class="muted mono">disconnected</span>
+        <button id="connect">Connect Wallet</button>
+      </div>
+    </header>
+
+    <main class="container">
+      <div class="grid">
+        <section class="card stack">
+          <h2>Contract</h2>
+          <div class="stack">
+            <label class="muted">Contract address</label>
+            <div class="row">
+              <input id="contractAddress" type="text" placeholder="0x... (MOONG contract)" />
+              <button id="saveAddress" class="secondary">Save</button>
+            </div>
+            <div class="muted mono" id="contractMeta">name: -, symbol: -, decimals: -</div>
+          </div>
+          <div class="hr"></div>
+          <div class="stack">
+            <label class="muted">Your address</label>
+            <div id="account" class="mono">-</div>
+          </div>
+          <div class="stack">
+            <label class="muted">Your MOONG balance</label>
+            <div id="balance" class="mono">-</div>
+            <button id="refresh" class="secondary">Refresh</button>
+          </div>
+        </section>
+
+        <section class="card stack">
+          <h2>Transfer</h2>
+          <div class="stack">
+            <label class="muted">Recipient</label>
+            <input id="to" type="text" placeholder="0xRecipient" />
+          </div>
+          <div class="stack">
+            <label class="muted">Amount</label>
+            <input id="amount" type="number" step="any" placeholder="100" />
+          </div>
+          <button id="send">Send</button>
+          <div id="txStatus" class="muted"></div>
+        </section>
+      </div>
+    </main>
+
+    <footer>
+      Built with Ethers + Hardhat. Use at your own risk.
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.2/dist/ethers.umd.min.js"></script>
+    <script>
+      // Minimal ERC20 ABI subset
+      const ERC20_ABI = [
+        "function name() view returns (string)",
+        "function symbol() view returns (string)",
+        "function decimals() view returns (uint8)",
+        "function balanceOf(address) view returns (uint256)",
+        "function transfer(address to, uint256 amount) returns (bool)"
+      ];
+
+      const qs = (s) => document.querySelector(s);
+      const el = {
+        network: qs('#network'),
+        connect: qs('#connect'),
+        networkSelect: qs('#networkSelect'),
+        contractAddress: qs('#contractAddress'),
+        saveAddress: qs('#saveAddress'),
+        contractMeta: qs('#contractMeta'),
+        account: qs('#account'),
+        balance: qs('#balance'),
+        refresh: qs('#refresh'),
+        to: qs('#to'),
+        amount: qs('#amount'),
+        send: qs('#send'),
+        txStatus: qs('#txStatus')
+      };
+
+      let provider = null;
+      let signer = null;
+      let contract = null;
+      let decimals = 18;
+      let symbol = "MOONG";
+
+      const NETWORKS = {
+        "0gTestnet": {
+          chainId: '0x40d9', // 16601
+          chainName: '0G Testnet',
+          nativeCurrency: { name: '0G', symbol: '0G', decimals: 18 },
+          rpcUrls: ['https://evmrpc-testnet.0g.ai'],
+          blockExplorerUrls: ['https://chainscan-galileo.0g.ai']
+        },
+        "0gMainnet": {
+          chainId: '0x2710', // 10000
+          chainName: '0G Mainnet',
+          nativeCurrency: { name: '0G', symbol: '0G', decimals: 18 },
+          rpcUrls: ['https://rpc.0g.ai']
+        }
+      };
+
+      function saveAddressLocally(addr) {
+        try { localStorage.setItem('moong_contract', addr || ''); } catch (_) {}
+      }
+      function restoreAddress() {
+        try { return localStorage.getItem('moong_contract') || ''; } catch (_) { return ''; }
+      }
+
+      async function connect() {
+        if (!window.ethereum) {
+          alert('No wallet found. Install MetaMask.');
+          return;
+        }
+        try {
+          // Request account access first
+          await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+          // Switch/add selected 0G network
+          const selected = el.networkSelect.value;
+          const netCfg = NETWORKS[selected];
+          try {
+            await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: netCfg.chainId }] });
+          } catch (switchErr) {
+            // Unrecognized chain -> add, then switch again
+            if (switchErr && switchErr.code === 4902) {
+              await window.ethereum.request({ method: 'wallet_addEthereumChain', params: [netCfg] });
+              await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: netCfg.chainId }] });
+            } else if (switchErr && switchErr.code === 4001) {
+              throw new Error('User rejected network switch');
+            } else {
+              throw switchErr;
+            }
+          }
+
+          provider = new ethers.BrowserProvider(window.ethereum);
+          const network = await provider.getNetwork();
+          el.network.textContent = `chain ${Number(network.chainId)} – ${network.name || 'unknown'}`;
+          signer = await provider.getSigner();
+          el.account.textContent = await signer.getAddress();
+          el.connect.textContent = 'Connected';
+          el.connect.disabled = true;
+          await initContract();
+        } catch (e) {
+          console.error(e);
+          const msg = e && e.message ? e.message : 'Failed to connect or switch network.';
+          alert(msg + ' Please approve the wallet prompt or add the 0G network manually.');
+        }
+      }
+
+      async function initContract() {
+        const address = el.contractAddress.value.trim();
+        if (!address) {
+          el.contractMeta.textContent = 'name: -, symbol: -, decimals: -';
+          contract = null;
+          return;
+        }
+        try {
+          contract = new ethers.Contract(address, ERC20_ABI, signer || provider);
+          const [nm, sym, dec] = await Promise.all([
+            contract.name(),
+            contract.symbol(),
+            contract.decimals()
+          ]);
+          decimals = Number(dec);
+          symbol = sym;
+          el.contractMeta.textContent = `name: ${nm}, symbol: ${sym}, decimals: ${dec}`;
+          await refreshBalance();
+        } catch (e) {
+          el.contractMeta.textContent = 'Invalid contract or network mismatch';
+          console.error(e);
+        }
+      }
+
+      async function refreshBalance() {
+        if (!contract || !signer) return;
+        try {
+          const addr = await signer.getAddress();
+          const bal = await contract.balanceOf(addr);
+          const formatted = ethers.formatUnits(bal, decimals);
+          el.balance.textContent = `${formatted} ${symbol}`;
+        } catch (e) {
+          el.balance.textContent = '-';
+          console.error(e);
+        }
+      }
+
+      async function send() {
+        el.txStatus.textContent = '';
+        if (!contract || !signer) {
+          el.txStatus.textContent = 'Connect wallet and set contract address first.';
+          el.txStatus.className = 'error';
+          return;
+        }
+        try {
+          const to = el.to.value.trim();
+          const amountStr = el.amount.value.trim();
+          if (!to || !amountStr) throw new Error('Missing recipient or amount');
+          const amount = ethers.parseUnits(amountStr, decimals);
+          const tx = await contract.connect(signer).transfer(to, amount);
+          el.txStatus.textContent = 'Sending transaction...';
+          el.txStatus.className = 'muted';
+          const receipt = await tx.wait();
+          el.txStatus.textContent = `Success: ${receipt.hash}`;
+          el.txStatus.className = 'success mono';
+          await refreshBalance();
+        } catch (e) {
+          el.txStatus.textContent = `Error: ${e.message || e}`;
+          el.txStatus.className = 'error';
+          console.error(e);
+        }
+      }
+
+      // Events
+      el.connect.addEventListener('click', connect);
+      el.refresh.addEventListener('click', refreshBalance);
+      el.send.addEventListener('click', send);
+      el.saveAddress.addEventListener('click', () => { saveAddressLocally(el.contractAddress.value.trim()); initContract(); });
+
+      // Init from storage and optional URL ?address=0x...
+      const urlParams = new URLSearchParams(location.search);
+      const fromUrl = urlParams.get('address');
+      const restored = restoreAddress();
+      el.contractAddress.value = fromUrl || restored || '';
+      if (el.contractAddress.value) initContract();
+
+      // Auto-refresh on account/network change
+      if (window.ethereum) {
+        window.ethereum.on?.('accountsChanged', async () => {
+          if (provider) {
+            signer = await provider.getSigner();
+            el.account.textContent = await signer.getAddress();
+            el.connect.textContent = 'Connected';
+            el.connect.disabled = true;
+            refreshBalance();
+          }
+        });
+        window.ethereum.on?.('chainChanged', () => { location.reload(); });
+      }
+    </script>
+  </body>
+  </html>
+
+

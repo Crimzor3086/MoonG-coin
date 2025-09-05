@@ -1,7 +1,7 @@
 {
   "0gTestnet": {
-    "url": "https://rpc-testnet.0g.ai",
-    "chainId": 9000
+    "url": "https://evmrpc-testnet.0g.ai",
+    "chainId": 16601
   },
   "0gMainnet": {
     "url": "https://rpc.0g.ai",

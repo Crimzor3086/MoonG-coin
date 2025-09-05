@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "MoonG Meme Coin on 0G",
   "scripts": {
+    "dev": "http-server -c-1 -p 5173 .",
     "compile": "hardhat compile",
     "deploy:testnet": "hardhat run scripts/deploy.js --network 0gTestnet",
     "deploy:mainnet": "hardhat run scripts/deploy.js --network 0gMainnet",
@@ -13,5 +14,8 @@
     "@openzeppelin/contracts": "^5.0.0",
     "dotenv": "^16.4.0",
     "hardhat": "^2.22.0"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
   }
 }
