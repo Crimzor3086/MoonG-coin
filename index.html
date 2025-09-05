@@ -143,6 +143,11 @@
         }
       };
 
+      function maskAddress(addr) {
+        if (!addr || addr.length < 10) return addr || '';
+        return addr.slice(0, 6) + '…' + addr.slice(-4);
+      }
+
       function saveAddressLocally(addr) {
         try { localStorage.setItem('moong_contract', addr || ''); } catch (_) {}
       }
@@ -180,7 +185,9 @@
           const network = await provider.getNetwork();
           el.network.textContent = `chain ${Number(network.chainId)} – ${network.name || 'unknown'}`;
           signer = await provider.getSigner();
-          el.account.textContent = await signer.getAddress();
+          const addr = await signer.getAddress();
+          el.account.textContent = maskAddress(addr);
+          el.account.title = addr;
           el.connect.textContent = 'Connected';
           el.connect.disabled = true;
           await initContract();
@@ -272,7 +279,9 @@
         window.ethereum.on?.('accountsChanged', async () => {
           if (provider) {
             signer = await provider.getSigner();
-            el.account.textContent = await signer.getAddress();
+            const addr = await signer.getAddress();
+            el.account.textContent = maskAddress(addr);
+            el.account.title = addr;
             el.connect.textContent = 'Connected';
             el.connect.disabled = true;
             refreshBalance();
